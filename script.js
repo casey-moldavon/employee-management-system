@@ -26,13 +26,13 @@ connection.connect(function(err) {
 // Delete
 
 // ================================================== CREATE ==================================================
-// newRole perameter will likely be from a choices prompt
-function addEmployee(newName, newRoleID, newCommander_id){
+// newPost perameter will likely be from a choices prompt
+function addEmployee(newName, newPostID, newCommander_id){
     console.log ("Adding employee \n");
     var query = connection.query("INSERT INTO employee SET ?",
         {
             full_name: newName,
-            role_id: newRoleID,
+            post_id: newPostID,
             commander_id: newCommander_id
         },
         function(err, res){
@@ -86,7 +86,7 @@ function displayEmployee(chosenEmployee){
 
 // ================================================== UPDATE ==================================================
 function updateRoster(){
-    console.log("Updating employee list \n");
+    console.log("Editing employee list \n");
     var query = connection.query("UPDATE employee SET ? WHERE ?",
         [
             {
@@ -197,3 +197,110 @@ function readSongArt(chosenArtist){
 //         if (answer.reply === "Artist"){}
 //     })
 // }
+
+
+function addPrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "add",
+            message: "What are you Adding to",
+            choices: ["Add station", "Add post", "Add employee"]
+        }
+    ])
+    //conditional here
+}
+
+function viewPrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "view",
+            message: "What are you Viewing to",
+            choices: ["View station", "View post", "View employee", "View All stations", "View All posts", "View All employees"]
+        }
+    ])
+    //conditional here
+}
+
+function EditPrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "Edit",
+            message: "What are you Editing?",
+            choices: ["Edit station", "Editing post", "Editing employee"]
+        }
+    ])
+    //conditional here
+}
+
+function deletePrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "delete",
+            message: "What are you Deleting to",
+            choices: ["Delete station", "Delete post", "Delete employee"]
+        }
+    ])
+    //conditional here
+}
+
+
+function firstPrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "first",
+            message: "Select action:",
+            choices: ["Add", "View", "Edit", "Delete"]
+        }
+    ]).then(function(answer){
+        
+    })
+}
+
+
+
+
+function inquireBID(){
+    let itemNames = [];
+​
+    for(let i = 0; i < itemList.length; i++){
+        itemNames.push(itemList[i].item);
+    }
+​
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                name: "itemChoice",
+                message: "Which item would you like to bid on?",
+                choices: itemNames
+            }
+        ]).then(function(ans){
+            const currentItem = ans.itemChoice;
+            inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        name: "userBid",
+                        message: "How much would you like to bid?"
+                    }
+                ]).then(function(ans){
+                    for(let i = 0; i < itemList.length; i++){
+                        if(currentItem === itemList[i].item){
+                            if(ans.userBid > itemList[i].startingBid){
+                                console.log("Congratulations, you're not cheap!!!")
+                                updateBid(currentItem,ans.userBid);
+                            } else {
+                                console.log("Your bid is not high enough!!!");
+                                startAuction();
+                            }
+                        }
+                    }
+                    startAuction();
+                });
+        });
+}
