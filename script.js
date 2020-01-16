@@ -27,6 +27,34 @@ connection.connect(function(err) {
 
 // ================================================== CREATE ==================================================
 // newPost perameter will likely be from a choices prompt
+function addStation(newName){
+    console.log ("Adding station \n");
+    var query = connection.query("INSERT INTO station SET ?",
+        {
+            name: newName,
+        },
+        function(err, res){
+            console.log(res.affectedRows + " added! \n");
+        }
+    );
+    console.log(query.sql);
+}
+
+function addPost(newTitle, newSalary, newStation_id){
+    console.log ("Adding post \n");
+    var query = connection.query("INSERT INTO post SET ?",
+        {
+            title: newTitle,
+            salary: newSalary,
+            station_id: newStation_id
+        },
+        function(err, res){
+            console.log(res.affectedRows + " Created! \n");
+        }
+    );
+    console.log(query.sql);
+}
+
 function addEmployee(newName, newPostID, newCommander_id){
     console.log ("Adding employee \n");
     var query = connection.query("INSERT INTO employee SET ?",
@@ -42,26 +70,37 @@ function addEmployee(newName, newPostID, newCommander_id){
     console.log(query.sql);
 }
 
-// ================================================== display all songs info ==================================================
+// ================================================== View All ==================================================
 // this function displays all songs and info (Self Note: not sure if this works)
-function displayRoster(){
-    console.log("Viewing employees \n");
+// viewStation displays all assigned employees.
+function  viewStation(){
+    console.log("Viewing chosen station \n");
+    connection.query()
+}
+
+
+function viewAllStations(){
+    console.log("Viewing All stations \n");
+    connection.query("SELECT * FROM station",function(err, res){
+        if (err) throw err;
+        console.log(res);
+    });
+}
+function viewAllPosts(){
+    console.log("Viewing All posts \n");
+    connection.query("SELECT * FROM post",function(err, res){
+        if (err) throw err;
+        console.log(res);
+    });
+}
+function viewAllEmployees(){
+    console.log("Viewing All employees \n");
     connection.query("SELECT * FROM employee",function(err, res){
         if (err) throw err;
         console.log(res);
-
-        // below is code to sort info
-        // var array = [];
-        // for (var i = 0; i < res.length; i++){
-        //     var obj = res[i];
-        //     for (var i = 0; i < obj.length; i++){
-        //         array.push(obj[artist]);
-        //     }
-        // }
-        // var count = array.length;
-        // console.log(object);
     });
 }
+
 
 
 // ================================================== READ (one) ==================================================
@@ -182,23 +221,24 @@ function readSongArt(chosenArtist){
 
 
 
-// ================================================== First Prompt ==================================================
-//  Asks how User would like ot search(what)
+// ========================= FIRST PROMPT =========================
+function firstPrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "first",
+            message: "Select action:",
+            choices: ["Add", "View", "Edit", "Delete"]
+        }
+    ]).then(function(answer){
+        if(answer === "Add"){addPrompt();}
+        else if(answer === "View"){viewPrompt();}
+        else if(answer === "Edit"){editPrompt();}
+        else{deletePrompt();}
+    });
+}
 
-// function firstQuestion(){
-//     inquirer.prompt([
-//         {
-//             type: "list",
-//             name: "reply",
-//             message: "What subject do you wish to search? ",
-//             choices: ["Artist", "Title", "Year", "Popularity"]
-//         }
-//     ]).then(function(answer){
-//         if (answer.reply === "Artist"){}
-//     })
-// }
-
-
+// ========================= ADD PROMPT =========================
 function addPrompt(){
     inquirer.prompt([
         {
@@ -207,27 +247,89 @@ function addPrompt(){
             message: "What are you Adding to",
             choices: ["Add station", "Add post", "Add employee"]
         }
-    ])
-    //conditional here
+    ]).then(function(answer){
+        if (answer.add === "Add station"){
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "station",
+                    message: "Type station name here: "
+                }
+            ]).then(function(ans){
+                addStation(ans.station);
+            });
+        }
+        else if (answer === "Add post"){
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "title",
+                    message: "Type post title here: "
+                },
+                {
+                    type: "input",
+                    name: "salary",
+                    message: "Type post salary here: "
+                },
+                {
+                    type: "input",
+                    name: "station_id",
+                    message: "Type post station ID here: "
+                }
+            ]).then(function(ans){
+                addPost(ans.title, ans.salary, ans.station_id);
+            });
+        }
+        else{
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "full_name",
+                    message: "Type employee name here: "
+                },
+                {
+                    type: "input",
+                    name: "post_id",
+                    message: "Type employee post ID here: "
+                },
+                {
+                    type: "input",
+                    name: "commander_id",
+                    message: "Type employee's commander ID here: "
+                }
+            ]).then(function(ans){
+                addEmployee(ans.full_name, ans.post_id, ans.commander_id)
+            });
+        }
+    });
 }
 
+// ========================= VIEW PROMPT =========================
 function viewPrompt(){
     inquirer.prompt([
         {
             type: "list",
             name: "view",
             message: "What are you Viewing to",
-            choices: ["View station", "View post", "View employee", "View All stations", "View All posts", "View All employees"]
+            choices: [
+                "View station",
+                "View post",
+                "View employee",
+                "View All stations",
+                "View All posts",
+                "View All employees"
+            ]
         }
     ])
     //conditional here
 }
 
-function EditPrompt(){
+// ========================= VIEW PROMPT =========================
+function editPrompt(){
     inquirer.prompt([
         {
             type: "list",
-            name: "Edit",
+            name: "edit",
             message: "What are you Editing?",
             choices: ["Edit station", "Editing post", "Editing employee"]
         }
@@ -235,6 +337,7 @@ function EditPrompt(){
     //conditional here
 }
 
+// ========================= DELETE PROMPT =========================
 function deletePrompt(){
     inquirer.prompt([
         {
@@ -245,20 +348,6 @@ function deletePrompt(){
         }
     ])
     //conditional here
-}
-
-
-function firstPrompt(){
-    inquirer.prompt([
-        {
-            type: "list",
-            name: "first",
-            message: "Select action:",
-            choices: ["Add", "View", "Edit", "Delete"]
-        }
-    ]).then(function(answer){
-        
-    })
 }
 
 
