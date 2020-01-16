@@ -17,20 +17,23 @@ connection.connect(function(err) {
 });
 
 
+
+
 // ~ CRUD ~
 // Create
 // Read
 // Update
 // Delete
 
-function create(newArtist, newTitle, newYear){
-    console.log ("Adding -tbd- \n");
-    var query = connection.query("INSERT INTO -tbd- SET ?",
+// ================================================== CREATE ==================================================
+// newRole perameter will likely be from a choices prompt
+function addEmployee(newName, newRoleID, newCommander_id){
+    console.log ("Adding employee \n");
+    var query = connection.query("INSERT INTO employee SET ?",
         {
-            //below are simple examples (Self Note: change for project)
-            artist: newArtist,
-            title: newTitle,
-            year: newYear,
+            full_name: newName,
+            role_id: newRoleID,
+            commander_id: newCommander_id
         },
         function(err, res){
             console.log(res.affectedRows + " Created! \n");
@@ -41,33 +44,34 @@ function create(newArtist, newTitle, newYear){
 
 // ================================================== display all songs info ==================================================
 // this function displays all songs and info (Self Note: not sure if this works)
-// function readSongs(){
-//     console.log("Viewing -tbd- \n");
-//     connection.query("SELECT * FROM -tbd-",function(err, res){
-//         if (err) throw err;
-//         console.log(res);
+function displayRoster(){
+    console.log("Viewing employees \n");
+    connection.query("SELECT * FROM employee",function(err, res){
+        if (err) throw err;
+        console.log(res);
 
-//         var array = [];
-//         for (var i = 0; i < res.length; i++){
-//             var obj = res[i];
-//             for (var i = 0; i < obj.length; i++){
-//                 array.push(obj[artist]);
-//             }
-//         }
-//         var count = array.length;
-//         console.log(object);
-//     });
-// }
+        // below is code to sort info
+        // var array = [];
+        // for (var i = 0; i < res.length; i++){
+        //     var obj = res[i];
+        //     for (var i = 0; i < obj.length; i++){
+        //         array.push(obj[artist]);
+        //     }
+        // }
+        // var count = array.length;
+        // console.log(object);
+    });
+}
 
 
-// ================================================== display song ==================================================
+// ================================================== READ (one) ==================================================
 // this function displays all songs based on the chosen artist.
 // prompts will be given to call readSongArt(prompt answer)
-function readSpecific(chosenArtist){
-    console.log("Select song from -tbd- \n");
-    connection.query("SELECT title FROM -tbd- WHERE ?",
+function displayEmployee(chosenEmployee){
+    console.log("Select full name from employee \n");
+    connection.query("SELECT full_name FROM employee WHERE ?",
     {
-        artist: chosenArtist
+        full_name: chosenEmployee
     },
     
     function(err, res){
@@ -77,10 +81,13 @@ function readSpecific(chosenArtist){
     });
 }
 
-// ================================================== Update Songs ==================================================
-function update(){
-    console.log("Updating -tbd- \n");
-    var query = connection.query("UPDATE products SET ? WHERE ?",
+
+
+
+// ================================================== UPDATE ==================================================
+function updateRoster(){
+    console.log("Updating employee list \n");
+    var query = connection.query("UPDATE employee SET ? WHERE ?",
         [
             {
                 //what we are changing
@@ -90,26 +97,24 @@ function update(){
             }
         ],
         function(err, res) {
-            console.log (res.affectedRows + " Updated! \n");
+            console.log (res.affectedRows + " Roster updated! \n");
         }
     );
     console.log(query.sql);
 }
 
 
-// ================================================== Remove Song ==================================================
-function delete(){
-    console.log("Deleting -tbd-");
-    connection.query(
-        "DELETE FROM -tbd- WHERE ?",
+// ================================================== DELETE ==================================================
+function deleteEmployee(name){
+    console.log("Removing terminated employee");
+    connection.query("DELETE FROM employee WHERE ?",
         {
-            //where we are deleting items (Power or category)
+            full_name: name
         },
         function(err, res){
-            console.log(res.affectedRows + " song Deleted! \n");
+            console.log(res.affectedRows + " Terminated employee Deleted! \n");
         });
 }
-
 
 
 
