@@ -13,8 +13,40 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n")
-    firstPrompt();
+    getAllStations();
 });
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~ ALL LISTS ~~~~~~~~~~~~~~~~~~~~~~~~~
+var stationList;
+function getAllStations(){
+    connection.query("SELECT * FROM station", function(err, res){
+        if (err) throw err;
+        stationList = res;
+        getAllPosts();
+    });
+}
+var postList;
+function getAllPosts(){
+    connection.query("SELECT * FROM post", function(err, res){
+        if (err) throw err;
+        postList = res;
+        getAllEmployees();
+    });
+}
+var employeeList;
+function getAllEmployees(){
+    connection.query("SELECT * FROM employee", function(err, res){
+        if (err) throw err;
+        employeeList = res;
+        firstPrompt();
+    });
+}
+
+
+
+
+
 
 
 // ================================================== Question ==================================================
@@ -102,26 +134,24 @@ function addPrompt(){
         }
         // ~~~~~~~~~~~~~~~~~~~~~~~~~ ADD EMPLOYEE ~~~~~~~~~~~~~~~~~~~~~~~~~
         else {
-            generateAllPosts();
+            postQuery();
         }
     });
 }
 
-var postList;
-
-function generateAllPosts(){
-    connection.query("SELECT * FROM post", function(err, res){
-        if (err) throw err;
-        postList = res;
-        postQuery();
-    });
-}
 
 function postQuery(){
     let postArray = [];
+    let captainArray = [];
 
     for (let i = 0; i < postList.length; i++){
         postArray.push(postList[i].title);
+    }
+
+    for (let i = 0; i < employeeList.length; i++){
+        if (employeeList[i].post_id === "Captain"){
+            captainArray.push(employeeList[i].full_name);
+        }
     }
 
     inquirer.prompt([
@@ -134,33 +164,18 @@ function postQuery(){
             type: "list",
             name: "post_id",
             message: "Select employee post ID: ",
-            choices: postArray,
+            choices: postArray
         },
         {
             type: "list",
             name: "commander_id",
             message: "Select employee's commanding officer: ",
-            choices: ["f", "i"]
+            choices: captainArray
         }
     ]).then(function(ans){
         addEmployee(ans.newName, ans.post_id, ans.commander_id);
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ========================= VIEW PROMPT =========================
 function viewPrompt(){
@@ -187,66 +202,6 @@ function viewPrompt(){
 
 
 
-
-
-// var captains = [];
-// function generateAllCaptains(){
-//     connection.query("SELECT * FROM employee", function(res){
-//         console.log(res);
-//         for (var i = 0; i < res.length; i++){
-//             if (crew[i].post_id === "Captain"){
-//                 captains.push(crew[i].full_name);
-//             }
-//         }
-//     })
-//     return captains;
-// }
-
-
-
-
-
-
-
-
-// var allStations = [];
-// function generateAllStations(){
-//     connection.query("SELECT * FROM station", function(res){
-//         allStations = res.name;
-//     })
-//     return allStations;
-// }
-
-// var allEmployees = [];
-// function generateAllEmployees(){
-//     connection.query("SELECT * FROM employee", function(res){
-//         allEmployees = res.full_name;
-//     })
-//     return allEmployees;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ========================= EDIT PROMPT =========================
 function editPrompt(){
     inquirer.prompt([
@@ -260,7 +215,6 @@ function editPrompt(){
 
         // ========== Edit Station ==========
         if (answer.edit == "Edit station"){
-            let choicesss = generateAllStations(allStations);
             inquirer.prompt([
                 {
                     type: "list",
@@ -279,7 +233,7 @@ function editPrompt(){
         }
         // ========== Edit Post ==========
         else if (answer.edit == "Edit post"){
-            let choicesss = generateAllPosts(allPosts);
+            let choicesss = getAllPosts(allPosts);
             inquirer.prompt([
                 {
                     type: "list",
@@ -331,7 +285,7 @@ function editPrompt(){
         }
         // ========== Edit Employee ==========
         else {
-            let choicesss = generateAllEmployees(allEmployees);
+            let choicesss = getAllEmployees(allEmployees);
             inquirer.prompt([
                 {
                     type: "list",
@@ -386,31 +340,21 @@ function editPrompt(){
 }
 
 // ========================= DELETE PROMPT =========================
-// function deletePrompt(){
-//     inquirer.prompt([
-//         {
-//             type: "list",
-//             name: "delete",
-//             message: "What are you Deleting to",
-//             choices: ["Delete station", "Delete post", "Delete employee"]
-//         }
-//     ])
-//     //conditional here
-// }
+function deletePrompt(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "delete",
+            message: "What are you Deleting to",
+            choices: ["Delete station", "Delete post", "Delete employee"]
+        }
+    ])
+    //conditional here
+}
 
 
 
 
-
-
-
-
-
-// ~ CRUD ~
-// Create
-// Read
-// Update
-// Delete
 
 // ========================= CREATE =========================
 // newPost perameter will likely be from a choices prompt
