@@ -44,12 +44,7 @@ function getAllEmployees(){
 }
 
 
-
-
-
-
-
-// ================================================== Question ==================================================
+// ========================= LAST PROMPT =========================
 // prompts user if they wish to search again
 function lastQuestion(){
     inquirer.prompt([
@@ -61,15 +56,16 @@ function lastQuestion(){
         }
     ]).then(function(answer){
         if (answer.reply === "Yes"){
-            firstPrompt();
+            getAllStations();
         } else {
             connection.end();
         }
     });
 }
 
-
-// ========================= FIRST PROMPT =========================
+// =========================              ==================================================
+// ========================= FIRST PROMPT ==================================================
+// =========================              ==================================================
 function firstPrompt(){
     console.log("Welcome to the Empire's Station Crew Database")
     inquirer.prompt([
@@ -213,14 +209,24 @@ function editPrompt(){
         }
     ]).then(function(answer){
 
+
+
         // ========== Edit Station ==========
         if (answer.edit == "Edit station"){
+
+            let stationArray = [];
+        
+            for (let i = 0; i < stationList.length; i++){
+                stationArray.push(stationList[i].title);
+            }
+
+
             inquirer.prompt([
                 {
                     type: "list",
                     name: "station",
                     message: "Select a station to Edit: ",
-                    choices: choicesss
+                    choices: stationArray
                 },
                 {
                     type: "input",
@@ -233,13 +239,19 @@ function editPrompt(){
         }
         // ========== Edit Post ==========
         else if (answer.edit == "Edit post"){
-            let choicesss = getAllPosts(allPosts);
+
+            let postArray = [];
+
+            for (let i = 0; i < postList.length; i++){
+                postArray.push(postList[i].title);
+            }
+            
             inquirer.prompt([
                 {
                     type: "list",
                     name: "post",
                     message: "Select a post to Edit: ",
-                    choices: choicesss
+                    choices: postArray
                 },
                 {
                     type: "list",
@@ -285,59 +297,69 @@ function editPrompt(){
         }
         // ========== Edit Employee ==========
         else {
-            let choicesss = getAllEmployees(allEmployees);
-            inquirer.prompt([
-                {
-                    type: "list",
-                    name: "employee",
-                    message: "Select an employee to Edit: ",
-                    choices: choicesss
-                },
-                {
-                    type: "list",
-                    name: "edit",
-                    message: "Select employee stat to Edit: ",
-                    choices: ["Name", "Post_id", "Commander_id"]
-                }
-            ]).then(function(ans){
-                if (ans.edit === "Name"){
-                    inquirer.prompt([
-                        {
-                            type: "input",
-                            name: "newName",
-                            message: "Type new Name: "
-                        }
-                    ]).then(function(ansTwo){
-                        updateEmployee(ans.employee, ans.edit, ansTwo.newName)
-                    });
-                }
-                else if (ans.edit === "Post_id"){
-                    inquirer.prompt([
-                        {
-                            type: "input",
-                            name: "newPost_id",
-                            message: "Type new title: "
-                        }
-                    ]).then(function(ansTwo){
-                        updateEmployee(ans.employee, ans.edit, ansTwo.newPost_id)
-                    });
-                }
-                else {
-                    inquirer.prompt([
-                        {
-                            type: "input",
-                            name: "newCommander_id",
-                            message: "Type new title: "
-                        }
-                    ]).then(function(ansTwo){
-                        updateEmployee(ans.employee, ans.edit, ansTwo.newCommander_id)
-                    });
-                }
-            });
+            editEmployee();
         }
-
     });
 }
+
+
+function editEmployee(){
+    let employeeArray = [];
+
+    for (let i = 0; i < employeeList.length; i++){
+        captainArray.push(employeeList[i].full_name);
+    }
+
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "employee",
+                message: "Select an employee to Edit: ",
+                choices: employeeArray
+            },
+            {
+                type: "list",
+                name: "edit",
+                message: "Select employee stat to Edit: ",
+                choices: ["Name", "Post_id", "Commander_id"]
+            }
+        ]).then(function(ans){
+            if (ans.edit === "Name"){
+                inquirer.prompt([
+                    {
+                        type: "input",
+                        name: "newName",
+                        message: "Type new Name: "
+                    }
+                ]).then(function(ansTwo){
+                    updateEmployee(ans.employee, ans.edit, ansTwo.newName)
+                });
+            }
+            else if (ans.edit === "Post_id"){
+                inquirer.prompt([
+                    {
+                        type: "input",
+                        name: "newPost_id",
+                        message: "Type new title: "
+                    }
+                ]).then(function(ansTwo){
+                    updateEmployee(ans.employee, ans.edit, ansTwo.newPost_id)
+                });
+            }
+            else {
+                inquirer.prompt([
+                    {
+                        type: "input",
+                        name: "newCommander_id",
+                        message: "Type new title: "
+                    }
+                ]).then(function(ansTwo){
+                    updateEmployee(ans.employee, ans.edit, ansTwo.newCommander_id)
+                });
+            }
+        });
+    }
+
 
 // ========================= DELETE PROMPT =========================
 function deletePrompt(){
@@ -353,8 +375,9 @@ function deletePrompt(){
 }
 
 
-
-
+// =========================                ==================================================
+// ========================= CRUD FUNCTIONS ==================================================
+// =========================                ==================================================
 
 // ========================= CREATE =========================
 // newPost perameter will likely be from a choices prompt

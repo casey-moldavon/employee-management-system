@@ -12,7 +12,7 @@ CREATE TABLE station (
 );
 
 INSERT INTO station (name)
-VALUES ("Star Destoryer "), ("Death Star");
+VALUES ("Star Destoryer"), ("Death Star");
 
 -- these are not added to or removed
 CREATE TABLE post (
