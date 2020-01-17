@@ -12,172 +12,10 @@ var connection = mysql.createConnection({
 // ================================================== Connection ==================================================
 connection.connect(function(err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadID + "\n")
-    startSearch();
+    console.log("connected as id " + connection.threadId + "\n")
+    firstPrompt();
 });
 
-
-
-
-// ~ CRUD ~
-// Create
-// Read
-// Update
-// Delete
-
-// ================================================== CREATE ==================================================
-// newPost perameter will likely be from a choices prompt
-function addStation(newName){
-    console.log ("Adding station \n");
-    var query = connection.query("INSERT INTO station SET ?",
-        {
-            name: newName,
-        },
-        function(err, res){
-            console.log(res.affectedRows + " added! \n");
-        }
-    );
-    console.log(query.sql);
-}
-
-function addPost(newTitle, newSalary, newStation_id){
-    console.log ("Adding post \n");
-    var query = connection.query("INSERT INTO post SET ?",
-        {
-            title: newTitle,
-            salary: newSalary,
-            station_id: newStation_id
-        },
-        function(err, res){
-            console.log(res.affectedRows + " Created! \n");
-        }
-    );
-    console.log(query.sql);
-}
-
-function addEmployee(newName, newPostID, newCommander_id){
-    console.log ("Adding employee \n");
-    var query = connection.query("INSERT INTO employee SET ?",
-        {
-            full_name: newName,
-            post_id: newPostID,
-            commander_id: newCommander_id
-        },
-        function(err, res){
-            console.log(res.affectedRows + " Created! \n");
-        }
-    );
-    console.log(query.sql);
-}
-
-// ================================================== View All ==================================================
-// this function displays all songs and info (Self Note: not sure if this works)
-// viewStation displays all assigned employees.
-function  viewStation(){
-    console.log("Viewing chosen station \n");
-    connection.query()
-}
-
-
-function viewAllStations(){
-    console.log("Viewing All stations \n");
-    connection.query("SELECT * FROM station",function(err, res){
-        if (err) throw err;
-        console.log(res);
-    });
-}
-function viewAllPosts(){
-    console.log("Viewing All posts \n");
-    connection.query("SELECT * FROM post",function(err, res){
-        if (err) throw err;
-        console.log(res);
-    });
-}
-function viewAllEmployees(){
-    console.log("Viewing All employees \n");
-    connection.query("SELECT * FROM employee",function(err, res){
-        if (err) throw err;
-        console.log(res);
-    });
-}
-
-
-
-// ================================================== READ (one) ==================================================
-// this function displays all songs based on the chosen artist.
-// prompts will be given to call readSongArt(prompt answer)
-function displayEmployee(chosenEmployee){
-    console.log("Select full name from employee \n");
-    connection.query("SELECT full_name FROM employee WHERE ?",
-    {
-        full_name: chosenEmployee
-    },
-    
-    function(err, res){
-        if (err) throw err;
-        console.log(res);
-        lastQuestion();
-    });
-}
-
-
-
-
-// ================================================== UPDATE ==================================================
-function updateRoster(){
-    console.log("Editing employee list \n");
-    var query = connection.query("UPDATE employee SET ? WHERE ?",
-        [
-            {
-                //what we are changing
-            },
-            {
-                //where it's being changed
-            }
-        ],
-        function(err, res) {
-            console.log (res.affectedRows + " Roster updated! \n");
-        }
-    );
-    console.log(query.sql);
-}
-
-
-// ================================================== DELETE ==================================================
-function deleteEmployee(name){
-    console.log("Removing terminated employee");
-    connection.query("DELETE FROM employee WHERE ?",
-        {
-            full_name: name
-        },
-        function(err, res){
-            console.log(res.affectedRows + " Terminated employee Deleted! \n");
-        });
-}
-
-
-
-
-
-
-
-
-
-
-
-// ================================================== Start ==================================================
-// likely remove this or add to firstQuestion()
-function startSearch(){
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "artist",
-            message: "Search songs by Artist: "
-        }
-    ]).then(function(answer){
-        readSongArt(answer.artist);
-    });
-}
 
 // ================================================== Question ==================================================
 // prompts user if they wish to search again
@@ -186,43 +24,22 @@ function lastQuestion(){
         {
             type: "list",
             name: "reply",
-            message: "Would you like to Search again?",
+            message: "Would you like to Select another Action?",
             choices: ["Yes", "No"]
         }
     ]).then(function(answer){
         if (answer.reply === "Yes"){
-            startSearch();
+            firstPrompt();
         } else {
             connection.end();
         }
     });
 }
 
-// used to join two tables:
-
-// SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
-// FROM Orders
-// INNER JOIN Customers
-// ON Orders.CustomerID=Customers.CustomerID;
-
-function readSongArt(chosenArtist){
-    console.log("Select song from -tbd- \n");
-    connection.query("SELECT title FROM -tbd- WHERE ?",
-    {
-        artist: chosenArtist
-    },
-
-    function(err, res){
-        if (err) throw err;
-        console.log(res);
-        lastQuestion();
-    });
-}
-
-
 
 // ========================= FIRST PROMPT =========================
 function firstPrompt(){
+    console.log("Welcome to the Empire's Station Crew Database")
     inquirer.prompt([
         {
             type: "list",
@@ -231,15 +48,16 @@ function firstPrompt(){
             choices: ["Add", "View", "Edit", "Delete"]
         }
     ]).then(function(answer){
-        if(answer === "Add"){addPrompt();}
-        else if(answer === "View"){viewPrompt();}
-        else if(answer === "Edit"){editPrompt();}
+        if(answer.first === "Add"){addPrompt();}
+        else if(answer.first === "View"){viewPrompt();}
+        else if(answer.first === "Edit"){editPrompt();}
         else{deletePrompt();}
     });
 }
 
 // ========================= ADD PROMPT =========================
 function addPrompt(){
+
     inquirer.prompt([
         {
             type: "list",
@@ -248,6 +66,7 @@ function addPrompt(){
             choices: ["Add station", "Add post", "Add employee"]
         }
     ]).then(function(answer){
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~ ADD STATION ~~~~~~~~~~~~~~~~~~~~~~~~~
         if (answer.add === "Add station"){
             inquirer.prompt([
                 {
@@ -259,7 +78,8 @@ function addPrompt(){
                 addStation(ans.station);
             });
         }
-        else if (answer === "Add post"){
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~ ADD POST ~~~~~~~~~~~~~~~~~~~~~~~~~
+        else if (answer.add === "Add post"){
             inquirer.prompt([
                 {
                     type: "input",
@@ -273,36 +93,74 @@ function addPrompt(){
                 },
                 {
                     type: "input",
-                    name: "station_id",
-                    message: "Type post station ID here: "
+                    name: "rank_level",
+                    message: "Type post Rank Level of authority here: "
                 }
             ]).then(function(ans){
-                addPost(ans.title, ans.salary, ans.station_id);
+                addPost(ans.title, ans.salary, ans.rank_level);
             });
         }
-        else{
-            inquirer.prompt([
-                {
-                    type: "input",
-                    name: "full_name",
-                    message: "Type employee name here: "
-                },
-                {
-                    type: "input",
-                    name: "post_id",
-                    message: "Type employee post ID here: "
-                },
-                {
-                    type: "input",
-                    name: "commander_id",
-                    message: "Type employee's commander ID here: "
-                }
-            ]).then(function(ans){
-                addEmployee(ans.full_name, ans.post_id, ans.commander_id)
-            });
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~ ADD EMPLOYEE ~~~~~~~~~~~~~~~~~~~~~~~~~
+        else {
+            generateAllPosts();
         }
     });
 }
+
+var postList;
+
+function generateAllPosts(){
+    connection.query("SELECT * FROM post", function(err, res){
+        if (err) throw err;
+        postList = res;
+        postQuery();
+    });
+}
+
+function postQuery(){
+    let postArray = [];
+
+    for (let i = 0; i < postList.length; i++){
+        postArray.push(postList[i].title);
+    }
+
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "newName",
+            message: "Type employee name here: "
+        },
+        {
+            type: "list",
+            name: "post_id",
+            message: "Select employee post ID: ",
+            choices: postArray,
+        },
+        {
+            type: "list",
+            name: "commander_id",
+            message: "Select employee's commanding officer: ",
+            choices: ["f", "i"]
+        }
+    ]).then(function(ans){
+        addEmployee(ans.newName, ans.post_id, ans.commander_id);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ========================= VIEW PROMPT =========================
 function viewPrompt(){
@@ -312,19 +170,84 @@ function viewPrompt(){
             name: "view",
             message: "What are you Viewing to",
             choices: [
-                "View station",
-                "View post",
-                "View employee",
+                // "View station",
+                // "View post",
+                // "View employee",
                 "View All stations",
                 "View All posts",
                 "View All employees"
             ]
         }
-    ])
-    //conditional here
+    ]).then(function(answer){
+        if (answer.view === "View All stations"){viewAllStations();}
+        else if (answer.view === "View All posts"){viewAllPosts();}
+        else{viewAllEmployees();}
+    });
 }
 
-// ========================= VIEW PROMPT =========================
+
+
+
+
+// var captains = [];
+// function generateAllCaptains(){
+//     connection.query("SELECT * FROM employee", function(res){
+//         console.log(res);
+//         for (var i = 0; i < res.length; i++){
+//             if (crew[i].post_id === "Captain"){
+//                 captains.push(crew[i].full_name);
+//             }
+//         }
+//     })
+//     return captains;
+// }
+
+
+
+
+
+
+
+
+// var allStations = [];
+// function generateAllStations(){
+//     connection.query("SELECT * FROM station", function(res){
+//         allStations = res.name;
+//     })
+//     return allStations;
+// }
+
+// var allEmployees = [];
+// function generateAllEmployees(){
+//     connection.query("SELECT * FROM employee", function(res){
+//         allEmployees = res.full_name;
+//     })
+//     return allEmployees;
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========================= EDIT PROMPT =========================
 function editPrompt(){
     inquirer.prompt([
         {
@@ -333,63 +256,322 @@ function editPrompt(){
             message: "What are you Editing?",
             choices: ["Edit station", "Editing post", "Editing employee"]
         }
-    ])
-    //conditional here
+    ]).then(function(answer){
+
+        // ========== Edit Station ==========
+        if (answer.edit == "Edit station"){
+            let choicesss = generateAllStations(allStations);
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "station",
+                    message: "Select a station to Edit: ",
+                    choices: choicesss
+                },
+                {
+                    type: "input",
+                    name: "newName",
+                    message: "Provide new station Name: "
+                }
+            ]).then(function(ans){
+                updateStation(ans.newName, station)
+            })
+        }
+        // ========== Edit Post ==========
+        else if (answer.edit == "Edit post"){
+            let choicesss = generateAllPosts(allPosts);
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "post",
+                    message: "Select a post to Edit: ",
+                    choices: choicesss
+                },
+                {
+                    type: "list",
+                    name: "edit",
+                    message: "Select post stat to Edit: ",
+                    choices: ["title", "salary", "rank_level"]
+                }
+            ]).then(function(ans){
+                if (ans.edit === "title"){
+                    inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "newTitle",
+                            message: "Type new title: "
+                        }
+                    ]).then(function(ansTwo){
+                        updatePost(ans.post, ans.edit, ansTwo.newTitle)
+                    });
+                }
+                else if (ans.edit === "salary"){
+                    inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "newSalary",
+                            message: "Type new title: "
+                        }
+                    ]).then(function(ansTwo){
+                        updatePost(ans.post, ans.edit, ansTwo.newSalary)
+                    });
+                }
+                else {
+                    inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "newRank_level",
+                            message: "Type new title: "
+                        }
+                    ]).then(function(ansTwo){
+                        updatePost(ans.post, ans.edit, ansTwo.newRank_level)
+                    });
+                }
+            })
+        }
+        // ========== Edit Employee ==========
+        else {
+            let choicesss = generateAllEmployees(allEmployees);
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "employee",
+                    message: "Select an employee to Edit: ",
+                    choices: choicesss
+                },
+                {
+                    type: "list",
+                    name: "edit",
+                    message: "Select employee stat to Edit: ",
+                    choices: ["Name", "Post_id", "Commander_id"]
+                }
+            ]).then(function(ans){
+                if (ans.edit === "Name"){
+                    inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "newName",
+                            message: "Type new Name: "
+                        }
+                    ]).then(function(ansTwo){
+                        updateEmployee(ans.employee, ans.edit, ansTwo.newName)
+                    });
+                }
+                else if (ans.edit === "Post_id"){
+                    inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "newPost_id",
+                            message: "Type new title: "
+                        }
+                    ]).then(function(ansTwo){
+                        updateEmployee(ans.employee, ans.edit, ansTwo.newPost_id)
+                    });
+                }
+                else {
+                    inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "newCommander_id",
+                            message: "Type new title: "
+                        }
+                    ]).then(function(ansTwo){
+                        updateEmployee(ans.employee, ans.edit, ansTwo.newCommander_id)
+                    });
+                }
+            });
+        }
+
+    });
 }
 
 // ========================= DELETE PROMPT =========================
-function deletePrompt(){
-    inquirer.prompt([
+// function deletePrompt(){
+//     inquirer.prompt([
+//         {
+//             type: "list",
+//             name: "delete",
+//             message: "What are you Deleting to",
+//             choices: ["Delete station", "Delete post", "Delete employee"]
+//         }
+//     ])
+//     //conditional here
+// }
+
+
+
+
+
+
+
+
+
+// ~ CRUD ~
+// Create
+// Read
+// Update
+// Delete
+
+// ========================= CREATE =========================
+// newPost perameter will likely be from a choices prompt
+function addStation(newName){
+    console.log ("Adding station \n");
+    var query = connection.query("INSERT INTO station SET ?",
         {
-            type: "list",
-            name: "delete",
-            message: "What are you Deleting to",
-            choices: ["Delete station", "Delete post", "Delete employee"]
+            name: newName,
+        },
+        function(err, res){
+            console.log(res.affectedRows + " added! \n");
+            lastQuestion()
         }
-    ])
-    //conditional here
+    );
+}
+
+function addPost(newTitle, newSalary, newRank_level){
+    console.log ("Adding post \n");
+    var query = connection.query("INSERT INTO post SET ?",
+        {
+            title: newTitle,
+            salary: newSalary,
+            rank_level: newRank_level
+        },
+        function(err, res){
+            console.log(res.affectedRows + " Created! \n");
+            lastQuestion()
+        }
+    );
+}
+
+function addEmployee(newName, newPostID, newCommander_id){
+    console.log ("Adding employee \n");
+    var query = connection.query("INSERT INTO employee SET ?",
+        {
+            full_name: newName,
+            post_id: newPostID,
+            commander_id: newCommander_id
+        },
+        function(err, res){
+            console.log(res.affectedRows + " Created! \n");
+            lastQuestion()
+        }
+    );
+}
+
+// ========================= View [One(?) / All] =========================
+
+function viewAllStations(){
+    console.log("Viewing All stations \n");
+    connection.query("SELECT * FROM station",function(err, res){
+        if (err) throw err;
+        console.log(res);
+        lastQuestion()
+    });
+}
+function viewAllPosts(){
+    console.log("Viewing All posts \n");
+    connection.query("SELECT * FROM post",function(err, res){
+        if (err) throw err;
+        console.log(res);
+        lastQuestion()
+    });
+}
+function viewAllEmployees(){
+    console.log("Viewing All employees \n");
+    connection.query("SELECT * FROM employee",function(err, res){
+        if (err) throw err;
+        console.log(res);
+        lastQuestion()
+    });
 }
 
 
-
-
-function inquireBID(){
-    let itemNames = [];
-​
-    for(let i = 0; i < itemList.length; i++){
-        itemNames.push(itemList[i].item);
-    }
-​
-    inquirer
-        .prompt([
+// ========================= UPDATE =========================
+function updateStation(newName, chosenStation){
+    console.log("Editing employee list \n");
+    var query = connection.query("UPDATE employee SET ? WHERE ?",
+        [
             {
-                type: "list",
-                name: "itemChoice",
-                message: "Which item would you like to bid on?",
-                choices: itemNames
+                name: newName
+            },
+            {
+                station: chosenStation
             }
-        ]).then(function(ans){
-            const currentItem = ans.itemChoice;
-            inquirer
-                .prompt([
-                    {
-                        type: "input",
-                        name: "userBid",
-                        message: "How much would you like to bid?"
-                    }
-                ]).then(function(ans){
-                    for(let i = 0; i < itemList.length; i++){
-                        if(currentItem === itemList[i].item){
-                            if(ans.userBid > itemList[i].startingBid){
-                                console.log("Congratulations, you're not cheap!!!")
-                                updateBid(currentItem,ans.userBid);
-                            } else {
-                                console.log("Your bid is not high enough!!!");
-                                startAuction();
-                            }
-                        }
-                    }
-                    startAuction();
-                });
+        ],
+        function(err, res) {
+            console.log (res.affectedRows + " Roster updated! \n");
+            lastQuestion()
+        }
+    );
+}
+
+function updatePost(chosenPost, chosenStat, newChange){
+    console.log("Editing employee list \n");
+    var query = connection.query("UPDATE employee SET ? WHERE ?",
+        [
+            {
+                chosenStat: newChange
+            },
+            {
+                title: chosenPost
+            }
+        ],
+        function(err, res) {
+            console.log (res.affectedRows + " Roster updated! \n");
+            lastQuestion()
+        }
+    );
+}
+
+function updateEmployee(chosenEmployee, chosenStat, newChange){
+    console.log("Editing employee list \n");
+    var query = connection.query("UPDATE employee SET ? WHERE ?",
+        [
+            {
+                chosenStat: newChange
+            },
+            {
+                full_name: chosenEmployee
+            }
+        ],
+        function(err, res) {
+            console.log (res.affectedRows + " Roster updated! \n");
+            lastQuestion()
+        }
+    );
+}
+
+
+// ========================= DELETE =========================
+function deleteStation(name){
+    console.log("Removing terminated Station");
+    connection.query("DELETE FROM station WHERE ?",
+        {
+            name: name
+        },
+        function(err, res){
+            console.log(res.affectedRows + " Terminated Station Deleted! \n");
+            lastQuestion()
+        });
+}
+function deletePost(name){
+    console.log("Removing terminated Post");
+    connection.query("DELETE FROM post WHERE ?",
+        {
+            title: name
+        },
+        function(err, res){
+            console.log(res.affectedRows + " Terminated Post Deleted! \n");
+            lastQuestion()
+        });
+}
+function deleteEmployee(name){
+    console.log("Removing terminated employee");
+    connection.query("DELETE FROM employee WHERE ?",
+        {
+            full_name: name
+        },
+        function(err, res){
+            console.log(res.affectedRows + " Terminated employee Deleted! \n");
+            lastQuestion()
         });
 }
