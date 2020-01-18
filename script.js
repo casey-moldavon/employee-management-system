@@ -101,9 +101,14 @@ function addPrompt(){
                     type: "input",
                     name: "station",
                     message: "Type station name here: "
+                },
+                {
+                    type: "input",
+                    name: "station_id",
+                    message: "Type station ID here: "
                 }
             ]).then(function(ans){
-                addStation(ans.station);
+                addStation(ans.station, ans.station_id);
             });
         }
         // ~~~~~~~~~~~~~~~~~~~~~~~~~ ADD POST ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,8 +142,14 @@ function addPrompt(){
 
 
 function postQuery(){
+    let stationArray = [];
     let postArray = [];
     let captainArray = [];
+    let admiralArray = [];
+
+    for (let i = 0; i < stationList.length; i++){
+        stationArray.push(stationList[i].station_id);
+    }
 
     for (let i = 0; i < postList.length; i++){
         postArray.push(postList[i].title);
@@ -147,6 +158,12 @@ function postQuery(){
     for (let i = 0; i < employeeList.length; i++){
         if (employeeList[i].post_id === "Captain"){
             captainArray.push(employeeList[i].full_name);
+        }
+    }
+
+    for (let i = 0; i < employeeList.length; i++){
+        if (employeeList[i].post_id === "Admiral"){
+            admiralArray.push(employeeList[i].full_name);
         }
     }
 
@@ -169,7 +186,21 @@ function postQuery(){
             choices: captainArray
         }
     ]).then(function(ans){
+        if (ans.post_id === "Captain" || ans.post_id === "Admiral"){
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "deploy_id",
+                    message: "Select station of deployment: ",
+                    choices: stationArray
+                }
+            ]).then(function(choice){
+                addOfficer(ans.newName, ans.post_id, ans.commander_id, choice.deploy_id)
+            });
+        }
+        else {
         addEmployee(ans.newName, ans.post_id, ans.commander_id);
+        }
     });
 }
 
@@ -205,22 +236,19 @@ function editPrompt(){
             type: "list",
             name: "edit",
             message: "What are you Editing?",
-            choices: ["Edit station", "Editing post", "Editing employee"]
+            choices: ["Edit station", "Edit post", "Edit employee"]
         }
     ]).then(function(answer){
 
-
+        let stationArray = [];
+        
+        for (let i = 0; i < stationList.length; i++){
+            stationArray.push(stationList[i].name);
+        }
 
         // ========== Edit Station ==========
-        if (answer.edit == "Edit station"){
-
-            let stationArray = [];
-        
-            for (let i = 0; i < stationList.length; i++){
-                stationArray.push(stationList[i].title);
-            }
-
-
+        //currently, only station name can be changed (As Design)
+        if (answer.edit === "Edit station"){
             inquirer.prompt([
                 {
                     type: "list",
@@ -234,7 +262,7 @@ function editPrompt(){
                     message: "Provide new station Name: "
                 }
             ]).then(function(ans){
-                updateStation(ans.newName, station)
+                updateStation(ans.newName, ans.station)
             })
         }
         // ========== Edit Post ==========
@@ -304,10 +332,28 @@ function editPrompt(){
 
 
 function editEmployee(){
+
+    let stationArray = [];
+    let postArray = [];
     let employeeArray = [];
+    let captainArray = [];
+
+    for (let i = 0; i < stationList.length; i++){
+        stationArray.push(stationList[i].station_id);
+    }
+
+    for (let i = 0; i < postList.length; i++){
+        postArray.push(postList[i].title);
+    }
 
     for (let i = 0; i < employeeList.length; i++){
-        captainArray.push(employeeList[i].full_name);
+        employeeArray.push(employeeList[i].full_name);
+    }
+
+    for (let i = 0; i < employeeList.length; i++){
+        if (employeeList[i].post_id === "Captain"){
+            captainArray.push(employeeList[i].full_name);
+        }
     }
 
         inquirer.prompt([
@@ -338,9 +384,10 @@ function editEmployee(){
             else if (ans.edit === "Post_id"){
                 inquirer.prompt([
                     {
-                        type: "input",
+                        type: "list",
                         name: "newPost_id",
-                        message: "Type new title: "
+                        message: "Select new Post: ",
+                        choices: postArray
                     }
                 ]).then(function(ansTwo){
                     updateEmployee(ans.employee, ans.edit, ansTwo.newPost_id)
@@ -349,9 +396,10 @@ function editEmployee(){
             else {
                 inquirer.prompt([
                     {
-                        type: "input",
+                        type: "list",
                         name: "newCommander_id",
-                        message: "Type new title: "
+                        message: "Select new Commanding Officer: ",
+                        choices: captainArray
                     }
                 ]).then(function(ansTwo){
                     updateEmployee(ans.employee, ans.edit, ansTwo.newCommander_id)
@@ -363,6 +411,22 @@ function editEmployee(){
 
 // ========================= DELETE PROMPT =========================
 function deletePrompt(){
+    let stationArray = [];
+    let postArray = [];
+    let employeeArray = []
+
+    for (let i = 0; i < stationList.length; i++){
+        stationArray.push(stationList[i].station_id);
+    }
+
+    for (let i = 0; i < postList.length; i++){
+        postArray.push(postList[i].title);
+    }
+
+    for (let i = 0; i < employeeList.length; i++){
+        employeeArray.push(employeeList[i].full_name);
+    }
+
     inquirer.prompt([
         {
             type: "list",
@@ -370,8 +434,45 @@ function deletePrompt(){
             message: "What are you Deleting to",
             choices: ["Delete station", "Delete post", "Delete employee"]
         }
-    ])
-    //conditional here
+    ]).then(function(answer){
+        
+        if (answer.delete === "Delete station"){
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "delStation",
+                    message: "Select Station to Delete: ",
+                    choices: stationArray
+                }
+            ]).then(function(ans){
+                deleteStation(ans.delStation);
+            });
+        }
+        else if(answer.delete === "Delete post"){
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "delPost",
+                    message: "Select Post to Delete: ",
+                    choices: postArray
+                }
+            ]).then(function(ans){
+                deletePost(ans.delPost);
+            });
+        }
+        else {
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "delEmployee",
+                    message: "Select Employee to Delete: ",
+                    choices: employeeArray
+                }
+            ]).then(function(ans){
+                deleteEmployee(ans.delEmployee);
+            });
+        }
+    });
 }
 
 
@@ -381,14 +482,15 @@ function deletePrompt(){
 
 // ========================= CREATE =========================
 // newPost perameter will likely be from a choices prompt
-function addStation(newName){
+function addStation(newName, newId){
     console.log ("Adding station \n");
     var query = connection.query("INSERT INTO station SET ?",
         {
             name: newName,
+            station_id: newId
         },
         function(err, res){
-            console.log(res.affectedRows + " added! \n");
+            console.log("Station added! \n");
             lastQuestion()
         }
     );
@@ -403,7 +505,7 @@ function addPost(newTitle, newSalary, newRank_level){
             rank_level: newRank_level
         },
         function(err, res){
-            console.log(res.affectedRows + " Created! \n");
+            console.log("Post created! \n");
             lastQuestion()
         }
     );
@@ -411,26 +513,55 @@ function addPost(newTitle, newSalary, newRank_level){
 
 function addEmployee(newName, newPostID, newCommander_id){
     console.log ("Adding employee \n");
+
+    let captainArray = [];
+    let captainId = [];
+
+    for (let i = 0; i < employeeList.length; i++){
+        if (employeeList[i].post_id === "Captain"){
+            captainArray.push(employeeList[i].full_name);
+            captainId = employeeList[i].deploy_id
+        }
+    }
+    
     var query = connection.query("INSERT INTO employee SET ?",
         {
             full_name: newName,
             post_id: newPostID,
-            commander_id: newCommander_id
+            commander_id: newCommander_id,
+            deploy_id: captainId
         },
         function(err, res){
-            console.log(res.affectedRows + " Created! \n");
+            console.log("Employee profile created! \n");
             lastQuestion()
         }
     );
 }
 
-// ========================= View [One(?) / All] =========================
+function addOfficer(newName, newPostID, newCommander_id, newDeploy){
+    console.log ("Adding Officer \n");
+
+    var query = connection.query("INSERT INTO employee SET ?",
+        {
+            full_name: newName,
+            post_id: newPostID,
+            commander_id: newCommander_id,
+            deploy_id: newDeploy
+        },
+    function(err, res){
+            console.log("Officer profile created! \n");
+            lastQuestion()
+        }
+    );
+}
+
+// ========================= READ [One(?) / All] =========================
 
 function viewAllStations(){
     console.log("Viewing All stations \n");
     connection.query("SELECT * FROM station",function(err, res){
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         lastQuestion()
     });
 }
@@ -438,7 +569,7 @@ function viewAllPosts(){
     console.log("Viewing All posts \n");
     connection.query("SELECT * FROM post",function(err, res){
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         lastQuestion()
     });
 }
@@ -446,7 +577,7 @@ function viewAllEmployees(){
     console.log("Viewing All employees \n");
     connection.query("SELECT * FROM employee",function(err, res){
         if (err) throw err;
-        console.log(res);
+        console.table(res);
         lastQuestion()
     });
 }
@@ -455,7 +586,7 @@ function viewAllEmployees(){
 // ========================= UPDATE =========================
 function updateStation(newName, chosenStation){
     console.log("Editing employee list \n");
-    var query = connection.query("UPDATE employee SET ? WHERE ?",
+    var query = connection.query("UPDATE station SET ? WHERE ?",
         [
             {
                 name: newName
@@ -465,7 +596,7 @@ function updateStation(newName, chosenStation){
             }
         ],
         function(err, res) {
-            console.log (res.affectedRows + " Roster updated! \n");
+            console.log ("Station updated! \n");
             lastQuestion()
         }
     );
@@ -473,7 +604,7 @@ function updateStation(newName, chosenStation){
 
 function updatePost(chosenPost, chosenStat, newChange){
     console.log("Editing employee list \n");
-    var query = connection.query("UPDATE employee SET ? WHERE ?",
+    var query = connection.query("UPDATE post SET ? WHERE ?",
         [
             {
                 chosenStat: newChange
@@ -483,7 +614,7 @@ function updatePost(chosenPost, chosenStat, newChange){
             }
         ],
         function(err, res) {
-            console.log (res.affectedRows + " Roster updated! \n");
+            console.log ("Post updated! \n");
             lastQuestion()
         }
     );
@@ -501,7 +632,7 @@ function updateEmployee(chosenEmployee, chosenStat, newChange){
             }
         ],
         function(err, res) {
-            console.log (res.affectedRows + " Roster updated! \n");
+            console.log ("Roster updated! \n");
             lastQuestion()
         }
     );
@@ -509,36 +640,54 @@ function updateEmployee(chosenEmployee, chosenStat, newChange){
 
 
 // ========================= DELETE =========================
-function deleteStation(name){
+function deleteStation(deleteId){
     console.log("Removing terminated Station");
     connection.query("DELETE FROM station WHERE ?",
         {
-            name: name
+            station_id: deleteId
         },
         function(err, res){
-            console.log(res.affectedRows + " Terminated Station Deleted! \n");
-            lastQuestion()
+            console.log("Terminated Station Deleted! \n");
+            getStationIds()
         });
 }
-function deletePost(name){
+
+function getStationIds(){
+    connection.query("SELECT station_id FROM station", function(err, res){
+        if (err) throw err;
+        var stationIds = res;
+
+        console.log("Removing terminated crew members");
+        connection.query("DELETE FROM employee WHERE ?",
+            {
+                deploy_id: stationIds
+            },
+            function(err, res){
+                console.log("Terminated crew Deleted! \n");
+                lastQuestion();
+            });
+    });
+}
+
+function deletePost(deleteTitle){
     console.log("Removing terminated Post");
     connection.query("DELETE FROM post WHERE ?",
         {
-            title: name
+            title: deleteTitle
         },
         function(err, res){
-            console.log(res.affectedRows + " Terminated Post Deleted! \n");
+            console.log("Terminated Post Deleted! \n");
             lastQuestion()
         });
 }
-function deleteEmployee(name){
+function deleteEmployee(deleteFullName){
     console.log("Removing terminated employee");
     connection.query("DELETE FROM employee WHERE ?",
         {
-            full_name: name
+            full_name: deleteFullName
         },
         function(err, res){
-            console.log(res.affectedRows + " Terminated employee Deleted! \n");
+            console.log("Terminated employee Deleted! \n");
             lastQuestion()
         });
 }
