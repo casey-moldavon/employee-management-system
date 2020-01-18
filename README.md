@@ -4,7 +4,7 @@ For this project, I wanted a way to generate and manage lists within the termina
 
 Of course, i wanted to make it a bit more interesting so i made it Star Wars theme...it just seemed to fit accurately, but this theme can easily be changed and adapted to any enviornment.
 
-![gif](images/baby-yoda.gif =250x250)
+![gif](images/babyyoda.gif)
 ​
 ## Getting Started
 
@@ -24,7 +24,7 @@ Step 11: Enjoy!
 
 I began with creating my database, creating the databse.sql and copying these elements to the MySQL Workbench (as shown in the image below).
 
-![image](images/mysql-image.png =250x250)
+![image](images/mysqlimage.png)
 
 Once i had my data, i began working on the CRUD functions...
 CRUD
@@ -35,7 +35,7 @@ D - Delete
 
 These functions primarily focus on organizing and manipulating data within MySQL Workbench. They use a specific syntax that takes some getting used to at first but quickly made sense once i put 2 and 2 together (example of a CRUD function below).
 
-![image](images/crud-image.png =250x250)
+![image](images/crudimage.png)
 
 I initially created the crud.js file to store these functions but eventually copied them into the primary js file (script.js). In the future i definitely will try to avoid this and instead create more files to stay organized. At this current moment, i'm afraid to break anything so going to keep it as it is but will likely come back to this project in the future to make some fixes.
 
@@ -44,11 +44,11 @@ On the script.js file i mostly focused on inquirer prompts which took a majority
 I wrote a lot of notes for each prompt, mostly to keep mny own sanity in check. After they were completed though, i deleted these to limit the clutter on the page but they mostly consisted of simple comments for myself such as: "prompt for employee post_id, choices include all current posts" and things like that. Also, using a physical notebook, i wrote out the standard path of the prompts in relation to the CRUD functions. Normally i would share more related images but its hard to display the path and flow of the project without just images of code from different sections of the script.js page. Instead, i'll throw in some gifs displaying the terminal functionality...
 
 
-![gif](images/add-feature.gif =250x250)
+![gif](images/addfeature.gif)
 
 This displays the Add, View and Edit features of my app.
 
-![gif](images/delete-feature.gif =250x250)
+![gif](images/deletefeature.gif)
 
 This displays the View, Edit and Delete features of my app.
 
