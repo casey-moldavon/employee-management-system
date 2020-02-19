@@ -27,11 +27,11 @@ I began with creating my database, creating the databse.sql and copying these el
 ![image](images/mysql-image.png)
 
 Once i had my data, i began working on the CRUD functions...
-CRUD
-C - Create
-R - Read
-U - Update
-D - Delete
+- CRUD:
+- C - Create
+- R - Read
+- U - Update
+- D - Delete
 
 These functions primarily focus on organizing and manipulating data within MySQL Workbench. They use a specific syntax that takes some getting used to at first but quickly made sense once i put 2 and 2 together (example of a CRUD function below).
 
