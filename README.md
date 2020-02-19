@@ -8,17 +8,17 @@ Of course, i wanted to make it a bit more interesting so i made it Star Wars the
 ​
 ## Getting Started
 
-Step 1: Visit my Github repository link at the bottom of this README.md
-Step 2: Select to Clone the repo.
-Step 3: Open Terminal or Git Bash
-Step 4: Type git clone (paste link here) to copy the repository
-Step 5: open files in VS Code or any other code viewing/editing tool
-Step 6: do an npm install (to get node_Module files)
-Step 7: open databse.sql and copy all content
-Step 8: Open MySQL Workbench (definitely needed to make this work)
-Step 9: Paste databse.sql content into a query and run it (lightning bolt)
-Step 10: return to VS Cote (or similar tool) and type node script.js in the terminal to start.
-Step 11: Enjoy!
+- Step 1: Visit my Github repository link at the bottom of this README.md
+- Step 2: Select to Clone the repo.
+- Step 3: Open Terminal or Git Bash
+- Step 4: Type git clone (paste link here) to copy the repository
+- Step 5: open files in VS Code or any other code viewing/editing tool
+- Step 6: do an npm install (to get node_Module files)
+- Step 7: open databse.sql and copy all content
+- Step 8: Open MySQL Workbench (definitely needed to make this work)
+- Step 9: Paste databse.sql content into a query and run it (lightning bolt)
+- Step 10: return to VS Cote (or similar tool) and type node script.js in the terminal to start.
+- Step 11: Enjoy!
 
 ## How I did this
 
